@@ -94,8 +94,11 @@ public class Agent : MonoBehaviour
 	//TOTAL FORCE ON ALL AGENTS
     private Vector3 ComputeForce()
     {
-        var force = CalculateGoalForce(maxspeed : 2) + CalculateAgentForce() + CalculateWallForce();
-
+        //var force = CalculateAgentForce() + GrowingSpiralForce();
+		//var force = CalculateAgentForce();
+		//var force = CalculateWallForce();
+		var force = CalculateGoalForce(maxspeed : 2) + CalculateAgentForce() + CalculateWallForce();
+		
         if (force != Vector3.zero)
         {
             return force.normalized * Mathf.Min(force.magnitude, Parameters.maxSpeed);
@@ -105,23 +108,23 @@ public class Agent : MonoBehaviour
         }
     }
     
-	
     private Vector3 CalculateGoalForce(float maxspeed)
     {
 		if (path.Count ==0 ){
 			return Vector3.zero;
 		}
 		var temp = path[0] - transform.position;
-		var dval = temp.normalized * Mathf.Min(temp.magnitude,maxspeed);
+		var maths = Mathf.Min(temp.magnitude,maxspeed);
+		var dval = temp.normalized * maths;
 		var actualvalue = rb.velocity;
 		var ret = (dval-actualvalue)/Parameters.T;
         return ret;
 		
     }
 
+
     private Vector3 CalculateAgentForce()
     {
-
         var agentForce = Vector3.zero;
 
         foreach (var i in perceivedNeighbors)
@@ -131,15 +134,14 @@ public class Agent : MonoBehaviour
                 continue;
             }
             var neighbor = AgentManager.agentsObjs[i];
-
             var dir = (transform.position - neighbor.transform.position).normalized;
-            var overlap = (radius + neighbor.radius) - Vector3.Distance(transform.position, i.transform.position);
-
+			var overlapdist =  Vector3.Distance(transform.position, i.transform.position);
+            var overlap = (radius + neighbor.radius) - overlapdist;
             agentForce += Parameters.A * Mathf.Exp(overlap / Parameters.B) * dir;
             agentForce += Parameters.k * (overlap > 0f ? overlap : 0) * dir;
-
             var tangent = Vector3.Cross(Vector3.up, dir);
-            agentForce += Parameters.Kappa * (overlap > 0f ? overlap : 0) * Vector3.Dot(rb.velocity - neighbor.GetVelocity(), tangent) * tangent;
+			var dotprod = Vector3.Dot(rb.velocity - neighbor.GetVelocity(), tangent);
+            agentForce += Parameters.Kappa * (overlap > 0f ? overlap : 0) * dotprod * tangent;
         }
         return agentForce;
     }

@@ -32,14 +32,19 @@ public class MoveAlongWallc : MonoBehaviour
         Wall[] allwalls = GameObject.FindObjectsOfType<Wall>();
 
         foreach (Wall cwall in allwalls){
-            float disttowall = (cwall.transform.position - this.transform.position).sqrMagnitude;
+            float disttowall = (cwall.transform.position - agent.transform.position).sqrMagnitude;
             if(disttowall < disttoclosestwall){
                 disttoclosestwall = disttowall;
                 closestwall = cwall;
-            }
-        }
+				Debug.Log(cwall);
 
-        agent.SetDestination(closestwall.transform.position);
+            }
+			
+        }
+		
+		agent.SetDestination(closestwall.transform.position);
+
+        
 
 
     }
