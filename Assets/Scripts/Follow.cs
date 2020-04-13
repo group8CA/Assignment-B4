@@ -2,17 +2,19 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class NewBehaviourScript : MonoBehaviour
+public class Follow : MonoBehaviour
 {
-    // Start is called before the first frame update
+    public float speed = 7.0f;
+    private Transform target;
+
     void Start()
     {
-        
+        target = GameObject.FindGameObjectWithTag("Player").GetComponent<Transform>();
     }
 
-    // Update is called once per frame
     void Update()
     {
-        
+        transform.LookAt(target.position);
+        transform.Translate(0.0f, 0.0f, speed * Time.deltaTime);
     }
 }
